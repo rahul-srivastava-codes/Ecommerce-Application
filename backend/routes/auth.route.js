@@ -4,7 +4,6 @@ const User = require("../Models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-// ----------------- Signup -----------------
 router.post("/signup", async (req, res) => {
   try {
     const { name, phonenumber, email, password, role } = req.body;
@@ -46,7 +45,6 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// ----------------- Login -----------------
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -69,7 +67,11 @@ router.post("/login", async (req, res) => {
 
     res
       .status(200)
-      .cookie("token", token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 })
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: false, // set true only if using https
+        sameSite: "lax",
+      })
       .json({ message: "Login successful", success: true });
   } catch (error) {
     console.error(error);

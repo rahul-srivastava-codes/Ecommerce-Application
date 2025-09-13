@@ -1,37 +1,30 @@
 import { Link } from "react-router-dom";
 import { CiShoppingCart } from "react-icons/ci";
 import { useState, useEffect } from "react";
-import axios from "../utils/Axios";
 
-function Nav({ onSearch }) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [products, setProducts] = useState([]);
+import BackendAPI from "../utils/BackendAPI";
 
-  // Fetch all products once
+function Nav() {
+  const [search, setsearch] = useState("");
+  const [product, setproduct] = useState([]);
+
   useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const { data } = await axios.get("products");
-        setProducts(data);
-      } catch (err) {
-        console.error("Error fetching products:", err);
+    async function fetch() {
+      if (search.length != 0) {
+        const { data } = await BackendAPI.get("/search/product/id", {
+          params: { query: search },
+        });
+        console.log(data);
+
+        if (!data.success) {
+          alert("No such product exist");
+        }
+        setproduct(data.product);
+        console.log(data.product);
       }
     }
-    fetchProducts();
-  }, []);
-
-  // Handle search input
-  const handleSearch = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-
-    if (onSearch) {
-      const filtered = products.filter((p) =>
-        p.title.toLowerCase().includes(query.toLowerCase())
-      );
-      onSearch(filtered);
-    }
-  };
+    fetch();
+  }, [search]);
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
@@ -45,14 +38,13 @@ function Nav({ onSearch }) {
         <div className="flex-1 mx-6">
           <input
             type="text"
-            value={searchQuery}
-            onChange={handleSearch}
             placeholder="Search products..."
             className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            value={search}
+            onChange={(e) => setsearch(e.target.value)}
           />
         </div>
 
-        {/* Links */}
         <div className="flex items-center gap-6">
           <Link
             to="/login"

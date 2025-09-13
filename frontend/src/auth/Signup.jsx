@@ -111,15 +111,18 @@ export default function Signup() {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Role
             </label>
-            <input
-              type="text"
+            <select
               name="role"
+              id="role"
               value={formData.role}
               onChange={handleChange}
-              placeholder="Enter phone number"
-              required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-            />
+              required
+            >
+              <option value="">Select a role</option>
+              <option value="customer">Customer</option>
+              <option value="seller">Seller</option>
+            </select>
           </div>
 
           <button

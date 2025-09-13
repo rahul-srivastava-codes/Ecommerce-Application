@@ -1,21 +1,24 @@
 import { Link } from "react-router-dom";
 import BackendAPI from "../../utils/BackendAPI";
+import { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
 
 function Cards({ product }) {
-  const addToCart = async (item) => {
-    try {
-      const res = await BackendAPI.post("/cart/add", {
-        productId: item.id,
-        title: item.title,
-        price: item.price,
-        image: item.image,
-      });
-      if (res.data.success) alert("Added to cart successfully!");
-    } catch (err) {
-      console.error("Error adding to cart:", err.response || err);
-      alert("Failed to add to cart. Make sure you are logged in.");
+  const [id, setid] = useState();
+
+  useEffect(() => {
+    async function addtoCart() {
+      if (!id) return; // prevent auto-trigger on mount
+      const res = await BackendAPI.get("/cart/add", { params: { query: id } });
+
+      if (res.data.success) {
+        toast("Product added in the cart", {
+          theme: "dark",
+        });
+      }
     }
-  };
+    addtoCart();
+  }, [id]);
 
   return (
     <div className="w-full h-[80vh] overflow-scroll flex items-center justify-between flex-wrap">
@@ -37,13 +40,15 @@ function Cards({ product }) {
             <div>{p.rating.count}</div>
           </div>
           <button
-            onClick={() => addToCart(p)}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 cursor-pointer transition"
+            onClick={() => setid(p.id)}
           >
             Add to Cart
           </button>
+          <ToastContainer theme="dark" position="top-right" />
         </div>
       ))}
+      {/* ✅ Correct placement */}
     </div>
   );
 }
